@@ -46,8 +46,8 @@ const dataFactory = () => {
   return data;
 }
 
-function calculateSales(data, condition ) {
-  return data.reduce((current, record) => condition (record) ? current + record.sales : current, 0);
+function calculateSales(data, condition) {
+  return data.reduce((current, record) => condition(record) ? current + record.sales : current, 0);
 }
 
 const convertToTree = (data) => {
@@ -76,6 +76,5 @@ const convertToTree = (data) => {
   })
 }
 
-const RAW_DATA= dataFactory();
-const MOCK_ROW_DATA = convertToTree(RAW_DATA);
-export default MOCK_ROW_DATA;
+const RAW_DATA = dataFactory();
+export const MOCK_ROW_DATA = convertToTree(RAW_DATA);

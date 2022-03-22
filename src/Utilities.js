@@ -1,44 +1,43 @@
 export const ALL_SELECTION = 'All';
 export const NO_SELECTION = 'No Selection';
-
-// const CONTINENT_VALUES = ['All', 'Europe', 'Asia', 'Africa', 'North America', 'South America'];
 export const CONTINENT_VALUES = ['Europe', 'Asia'];
-const MONTH_COLUMN = {
-  field: 'month',
-  rowGroup: true,
-  hide: true,
-}
-const YEAR_COLUMN = {
-  field: 'year',
-  rowGroup: true,
-  hide: true,
-}
+
+/* INDIVIDUAL COLUMNS */
+const CONTINENT = {
+  field: 'continent', rowGroup: true, hide: true
+};
+const COUNTRY = {
+  field: 'country', rowGroup: true, hide: true
+};
+const REGION = {
+  field: 'region', rowGroup: true, hide: true
+};
+const SECTION = { field: 'section' };
+const MONTH = {
+  field: 'month', rowGroup: true, hide: true
+};
+const YEAR = {
+  field: 'year', rowGroup: true, hide: true
+};
+const SALES = {
+  field: 'sales', aggFunc: 'sum'
+};
+
+/*END OF INDIVIDUAL COLUMNS */
+
 export const COLUMN_DEFINITIONS = {
   NOTHING_SELECTED: [],
   ALL_CONTINENTS_SELECTED: [
-    {field: 'continent', rowGroup: true, hide: true},
-    YEAR_COLUMN, MONTH_COLUMN,
-    {field: 'sales', aggFunc: 'sum'}
+    CONTINENT, YEAR, MONTH, SALES
   ],
   ONE_CONTINENT_SELECTED: [
-    {field: 'continent', rowGroup: true, hide: true},
-    {field: 'country', rowGroup: true, hide: true},
-    YEAR_COLUMN, MONTH_COLUMN,
-    {field: 'sales', aggFunc: 'sum'}
+    COUNTRY, YEAR, MONTH, SALES
   ],
   COUNTRY_SELECTED: [
-    {field: 'continent', rowGroup: true, hide: true},
-    {field: 'country', rowGroup: true, hide: true},
-    {field: 'region', rowGroup: true, hide: true},
-    YEAR_COLUMN, MONTH_COLUMN,
-    {field: 'sales', aggFunc: 'sum'}
+    REGION, YEAR, MONTH, SALES
   ],
   REGION_SELECTED: [
-    {field: 'continent', rowGroup: true, hide: true},
-    {field: 'country', rowGroup: true, hide: true},
-    {field: 'region', rowGroup: true, hide: true},
-    {field: 'section'},
-    YEAR_COLUMN, MONTH_COLUMN,
-    {field: 'sales', aggFunc: 'sum'}
+    SECTION, YEAR, MONTH, SALES
   ]
-}
+};
+
