@@ -1,135 +1,157 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
-import { v4 as uuidv4 } from 'uuid';
-import { ALL_SELECTION, NO_SELECTION, CONTINENT_VALUES, COLUMN_DEFINITIONS } from "./Utilities";
-import { mockServerRowDataRequest, getCountriesByContinent, getRegionsByCountry } from "./Server";
+import { NO_SELECTION, CONTINENTS, COLUMN_DEFINITIONS } from "./Utilities";
+import { mockServerRowDataRequest, getCountriesByContinent, getCitiesByCountry } from "./Server";
 
 function Grid() {
   const gridRef = useRef();
   const [rowData, setRowData] = useState([]);
-  const [columnDefs, setColumnDefs] = useState(COLUMN_DEFINITIONS.NOTHING_SELECTED);
   const [inputOptions, setInputOptions] = useState({
-    continents: CONTINENT_VALUES, countries: [], regions: []
-  })
-  const [selectedHierarchy, setSelectedHierarchy] = useState({
-    continent: undefined, country: undefined, region: undefined
-  })
+    continents: undefined, countries: undefined, cities: undefined
+  });
+  const [selectedOptions, setSelectedOptions] = useState({
+    continent: undefined, country: undefined, city: undefined
+  });
 
-  useEffect(() => {
-    mockServerRowDataRequest(selectedHierarchy).then((data) => setRowData(data));
-  }, [selectedHierarchy])
+  const setColumnDefs = useCallback((columnDefs) => {
+    if (!gridRef.current) return;
+    gridRef.current.api.setColumnDefs(columnDefs);
+  }, []);
+
+  // useEffect(() => {
+  //   mockServerRowDataRequest(selectedOptions).then((data) => {
+  //     setRowData(data);
+  //   });
+  // }, [selectedOptions]);
+
+  const onGridReady = useCallback(() => {
+    setColumnDefs(COLUMN_DEFINITIONS.NOTHING_SELECTED);
+  }, [setColumnDefs]);
+
+
+  // const labelStylesAndNames = {
+  //   continent: { style: { marginRight: '5px', fontFamily: 'sans-serif' }, name: 'Continent' },
+  //   country: { style: { marginRight: '18px', fontFamily: 'sans-serif' }, name: 'Country' },
+  //   city: { style: { marginRight: '46px', fontFamily: 'sans-serif' }, name: 'City' },
+  // };
+
+
+  // useEffect(() => {
+  //   setInputOptions({ continents: undefined, countries: undefined, cities: undefined })
+  // }, [inputOptions]);
+
 
   function onContinentChanged(newContinent) {
     if (newContinent === NO_SELECTION) {
-      setRowData([])
-      setColumnDefs(COLUMN_DEFINITIONS.NOTHING_SELECTED)
+      setRowData([]);
+      setColumnDefs(COLUMN_DEFINITIONS.NOTHING_SELECTED);
+      setSelectedOptions({ continent: newContinent, country: undefined, city: undefined });
     } else {
       getCountriesByContinent(newContinent).then((countries) => {
-        setInputOptions({ continents: CONTINENT_VALUES, countries, regions: [] })
-        newContinent === ALL_SELECTION ? setColumnDefs(COLUMN_DEFINITIONS.ALL_CONTINENTS_SELECTED) : setColumnDefs(COLUMN_DEFINITIONS.ONE_CONTINENT_SELECTED)
+        setInputOptions({ continents: CONTINENTS, countries, cities: [] });
+        setColumnDefs(COLUMN_DEFINITIONS.CONTINENT_SELECTED);
+        setSelectedOptions({ ...selectedOptions, continent: newContinent });
       })
     }
-    setSelectedHierarchy({ continent: newContinent, country: undefined, region: undefined })
+    /*Ask if this is better than explicitly putting it in the IF/ELSE? */
+    // setSelectedHierarchy({ continent: newContinent, country: undefined, city: undefined })
   }
 
-  function onCountryChanged(newCountry) {
-    getRegionsByCountry(selectedHierarchy.continent, newCountry).then((regions) => {
-      setInputOptions({ ...inputOptions, regions })
-      setSelectedHierarchy({ ...selectedHierarchy, country: newCountry, region: undefined })
-      setColumnDefs(COLUMN_DEFINITIONS.COUNTRY_SELECTED)
+  const onCountryChanged = newCountry => {
+    getCitiesByCountry(newCountry).then((cities) => {
+      setInputOptions({ ...inputOptions, cities });
+      setColumnDefs(COLUMN_DEFINITIONS.COUNTRY_SELECTED);
+      setSelectedOptions({ ...selectedOptions, country: newCountry });
     })
   }
 
-  function onRegionChanged(newRegion) {
-    setSelectedHierarchy({ ...selectedHierarchy, region: newRegion })
-    setColumnDefs(COLUMN_DEFINITIONS.REGION_SELECTED)
+  const onCityChanged = newCity => {
+    setColumnDefs(COLUMN_DEFINITIONS.CITY_SELECTED);
+    setSelectedOptions({ ...selectedOptions, city: newCity });
   }
 
   function makeOptions(optionsArray) {
+    // sometimes optionsArray is undefined because options are async.
+    // solve this.
+    if (optionsArray == null) return;
+
     const results = optionsArray.map((op) => {
-      return (<option key={uuidv4()}>{op}</option>)
+      return (<option key={op}>{op}</option>)
     })
-    results.unshift(<option key={uuidv4()}>No Selection</option>)
+    results.unshift(<option key={'no select'}>No Selection</option>)
     return results
   }
 
-  return (<div
-    style={{ marginLeft: '20px', marginTop: '20px' }}
-  >
-    <div style={{ marginBottom: '5px' }}>
+  function makeDropdownSelector(nameAndStyle, chosenValue, onChangeCB, optionsArray) {
+    return (
+      <div style={{ marginBottom: '5px' }}>
+        <label style={nameAndStyle.style}>{nameAndStyle.name}</label>
+        <select
+          value={chosenValue}
+          onChange={(e) => {
+            onChangeCB(e.target.value)
+          }}>
+          {makeOptions()}
+        </select>
+      </div>
+    );
+  }
+
+  // const makeOptionsPanel = () => {
+
+
+
+  //   const makeDropDown = () => {
+  //     const makeOptions = () => {
+
+  //     }
+  //     return (
+  //       <div>
+  //         BANG!
+  //       </div>
+  //     )
+  //   }
+
+  //   return (
+  //     <div style={{ marginBottom: '5px' }}>
+  //       {makeDropDown()}
+  //     </div>
+  //   );
+  // }
+
+  return (
+    <div style={{ marginLeft: '20px', marginTop: '20px' }}>
+      {/* {makeOptionsPanel()} */}
       <div style={{ marginBottom: '5px' }}>
         <label style={{ marginRight: '5px', fontFamily: 'sans-serif' }}>Continent</label>
         <select
-          value={selectedHierarchy.continent}
+          value={selectedOptions.continent}
           onChange={(e) => {
             onContinentChanged(e.target.value)
           }}>
-          {makeOptions(CONTINENT_VALUES)}
+          {makeOptions(undefined)}
         </select>
       </div>
-      <div style={{ marginBottom: '5px' }}>
-        <label style={{ marginRight: '18px', fontFamily: 'sans-serif' }}>Country</label>
-        <select
-          value={selectedHierarchy.country}
-          onChange={(e) => {
-            onCountryChanged(e.target.value)
-          }}>
-          {makeOptions(inputOptions.countries)}
-        </select>
+      <div
+        className="ag-theme-alpine-dark"
+        style={{ width: '1200px', height: '675px' }}
+      >
+        <AgGridReact
+          onGridReady={onGridReady}
+          autoGroupColumnDef={{ cellRendererParams: { suppressCount: true } }}
+          rowGroupPanelShow={'always'}
+          groupDisplayType={'multipleColumns'}
+          suppressAggFuncInHeader={true}
+          groupDefaultExpanded={0}
+          ref={gridRef}
+          rowData={rowData}
+          defaultColDef={{ flex: 1 }}
+        />
       </div>
-
-      <div>
-        <label style={{ marginRight: '23px', fontFamily: 'sans-serif' }}>Region</label>
-        <select
-          value={selectedHierarchy.region}
-          onChange={(e) => {
-            onRegionChanged(e.target.value)
-          }}>
-          {makeOptions(inputOptions.regions)}
-        </select>
-      </div>
-
-
-    </div>
-    <div
-      className="ag-theme-alpine-dark"
-      style={{ width: '1200px', height: '675px' }}
-    >
-      <AgGridReact
-        autoGroupColumnDef={{ cellRendererParams: { suppressCount: true } }}
-        groupDisplayType={'multipleColumns'}
-        suppressAggFuncInHeader={true}
-        groupDefaultExpanded={0}
-        ref={gridRef}
-        rowData={rowData}
-        defaultColDef={{ flex: 1 }}
-        columnDefs={columnDefs}
-      />
-    </div>
-  </div>);
+    </div>);
 }
 
 export default Grid;
-
-        // sideBar={{
-        //   toolPanels: [{
-        //     id: 'columns',
-        //     labelDefault: 'Columns',
-        //     labelKey: 'columns',
-        //     iconKey: 'columns',
-        //     toolPanel: 'agColumnsToolPanel',
-        //     toolPanelParams: {
-        //       suppressRowGroups: true,
-        //       suppressValues: true,
-        //       suppressPivots: true,
-        //       suppressPivotMode: true,
-        //       suppressColumnFilter: true,
-        //       suppressColumnSelectAll: true,
-        //       suppressColumnExpandAll: true,
-        //     },
-        //   },],
-        //   defaultToolPanel: undefined
-        // }}
