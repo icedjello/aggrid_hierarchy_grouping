@@ -64,10 +64,17 @@ function Grid() {
     }, [selectedOptions, inputOptions]
   )
 
-  const onCityChanged = newCity => {
-    setColumnDefs(COLUMN_DEFINITIONS.CITY_SELECTED);
-    setSelectedOptions({ ...selectedOptions, city: newCity });
-  }
+  const onCityChanged = useCallback(
+    newCity => {
+      setColumnDefs(COLUMN_DEFINITIONS.CITY_SELECTED);
+      setSelectedOptions({ ...selectedOptions, city: newCity });
+    }
+    , [selectedOptions]
+  )
+
+
+
+
 
   const makeContinentSelector = useCallback(() => {
     return (<>
