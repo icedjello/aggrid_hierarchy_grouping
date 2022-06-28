@@ -3,6 +3,7 @@ import { CONTINENTS_WITH_COUNTRIES, COUNTRIES_WITH_CITIES } from './Utilities';
 import { cloneDeep } from "lodash";
 
 function getRowData(chosenContinent, chosenCountry, chosenCity) {
+  if (chosenContinent == null && chosenCountry == null) { return []; }
   let result = cloneDeep(MOCK_DATA);
   if (chosenContinent) {
     result = result.filter(({ continent }) => continent === chosenContinent);
