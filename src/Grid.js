@@ -64,6 +64,10 @@ function Grid() {
     }, [selectedOptions, inputOptions]
   )
 
+  const onCityChanged = newCity => {
+    setColumnDefs(COLUMN_DEFINITIONS.CITY_SELECTED);
+    setSelectedOptions({ ...selectedOptions, city: newCity });
+  }
 
   const makeContinentSelector = useCallback(() => {
     return (<>
@@ -90,10 +94,23 @@ function Grid() {
     </>)
   }, [onCountryChanged, inputOptions.countries])
 
+  const makeCitySelector = useCallback(() => {
+    return (<>
+      <label
+        style={{ marginRight: '23px', fontFamily: 'sans-serif' }}
+      >City:</label>
+      <select
+        defaultValue={NO_SELECTION}
+        onChange={e => onCityChanged(e.target.value)}
+      >{makeOptions(inputOptions.cities, 'city')}</select>
+    </>)
+  }, [onCityChanged, inputOptions.cities])
+
   return (
     <div style={{ marginLeft: '20px', marginTop: '20px' }}>
       {makeContinentSelector()}
       {makeCountrySelector()}
+      {makeCitySelector()}
       <div
         className="ag-theme-alpine-dark"
         style={{ width: '1200px', height: '675px' }}
