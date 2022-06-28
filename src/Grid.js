@@ -29,7 +29,7 @@ function Grid() {
   }, [selectedOptions]);
 
   const makeOptions = (options, nameForNoSelection) => {
-    const resultOptions = options.map(option => <option key={option}>{option}</option>);
+    const resultOptions = options == null ? [] : options.map(option => <option key={option}>{option}</option>);
     resultOptions.unshift(
       <option
         key={`${NO_SELECTION}-${nameForNoSelection}`}
@@ -54,6 +54,17 @@ function Grid() {
     }, [selectedOptions]
   )
 
+  const onCountryChanged = useCallback(
+    newCountry => {
+      getCitiesByCountry(newCountry).then((cities) => {
+        setInputOptions({ ...inputOptions, cities });
+        setColumnDefs(COLUMN_DEFINITIONS.COUNTRY_SELECTED);
+        setSelectedOptions({ ...selectedOptions, country: newCountry });
+      })
+    }, [selectedOptions, inputOptions]
+  )
+
+
   const makeContinentSelector = useCallback(() => {
     return (<>
       <label
@@ -67,11 +78,22 @@ function Grid() {
 
   }, [onContinentChanged, inputOptions.continents])
 
-
+  const makeCountrySelector = useCallback(() => {
+    return (<>
+      <label
+        style={{ marginRight: '18px', fontFamily: 'sans-serif' }}
+      >Country:</label>
+      <select
+        defaultValue={NO_SELECTION}
+        onChange={e => onCountryChanged(e.target.value)}
+      >{makeOptions(inputOptions.countries, 'country')}</select>
+    </>)
+  }, [onCountryChanged, inputOptions.countries])
 
   return (
     <div style={{ marginLeft: '20px', marginTop: '20px' }}>
       {makeContinentSelector()}
+      {makeCountrySelector()}
       <div
         className="ag-theme-alpine-dark"
         style={{ width: '1200px', height: '675px' }}
