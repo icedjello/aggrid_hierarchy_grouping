@@ -23,7 +23,7 @@ function mockServerRowDataRequest({ continent, country, city }) {
 
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve(rowData)
+      resolve(rowData);
     }, 500)
   })
 }
@@ -44,4 +44,4 @@ function getCountriesByContinent(continent) {
   });
 }
 
-export { mockServerRowDataRequest, getCitiesByCountry, getCountriesByContinent }
+export { getCitiesByCountry, getCountriesByContinent, mockServerRowDataRequest }

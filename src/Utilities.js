@@ -24,33 +24,82 @@ const COUNTRIES_WITH_CITIES = (function (baseStructure = START_STRUCTURE) {
 
 /* INDIVIDUAL COLUMNS */
 const COUNTRY = {
-  field: 'country', rowGroup: true, hide: true
+  headerName: 'Country',
+  showRowGroup: 'country',
+  cellRenderer: 'agGroupCellRenderer',
+  cellRendererParams: { suppressCount: true }
 };
+const COUNTRY_HIDDEN = {
+  field: 'country',
+  rowGroup: true,
+  hide: true
+}
+
 const CITY = {
-  field: 'city', rowGroup: true, hide: true
+  headerName: 'City',
+  showRowGroup: 'city',
+  // valueFormatter: params => { console.log(params.node.key) },
+  cellRenderer: 'agGroupCellRenderer',
+  cellRendererParams: { suppressCount: true }
+};
+const CITY_HIDDEN = {
+  field: 'city',
+  rowGroup: true,
+  hide: true
 };
 
 const MONTH = {
-  field: 'month', rowGroup: true, hide: true
+  headerName: 'Month',
+  showRowGroup: 'month',
 };
+
+const MONTH_HIDDEN = {
+  field: 'month',
+  rowGroup: true,
+  hide: true,
+  keyCreator: ({ value }) => ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"][value]
+
+}
+
 const YEAR = {
-  field: 'year', rowGroup: true, hide: true
+  headerName: 'Year',
+  showRowGroup: 'year',
+  cellRenderer: 'agGroupCellRenderer',
+  cellRendererParams: { suppressCount: true }
 };
+const YEAR_HIDDEN = {
+  field: 'year',
+  rowGroup: true,
+  hide: true
+}
+
 const SALES = {
-  field: 'sales', aggFunc: 'sum'
+  field: 'sales',
+  aggFunc: 'sum',
+  // below formatter from: https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+  cellRenderer: ({ value }) => `£ ${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
 };
 /*END OF INDIVIDUAL COLUMNS */
 
 const COLUMN_DEFINITIONS = {
   NOTHING_SELECTED: [],
   CONTINENT_SELECTED: [
-    COUNTRY, YEAR, MONTH, SALES
+    COUNTRY, COUNTRY_HIDDEN,
+    YEAR, YEAR_HIDDEN,
+    MONTH, MONTH_HIDDEN,
+    SALES
   ],
   COUNTRY_SELECTED: [
-    CITY, YEAR, MONTH, SALES
+    CITY, CITY_HIDDEN,
+    YEAR, YEAR_HIDDEN,
+    MONTH, MONTH_HIDDEN,
+    SALES
   ],
   CITY_SELECTED: [
-    YEAR, MONTH, SALES
+    YEAR, YEAR_HIDDEN,
+    MONTH, MONTH_HIDDEN,
+    SALES
   ]
 };
 

@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Noto Sans JP', sans-serif;
+  color: whitesmoke;
+}
+
+body {
+  margin: 0;
+  background-color: #3f3f3f;
+}
+
+.selector {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+label {
+  margin-right: 10px;
+}
+
+
